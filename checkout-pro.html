@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+
+<body>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <script>
+    const mp = new MercadoPago('APP_USR-18a5a6ef-005b-4839-9d1f-2690542ce5f0');
+  </script>
+  <form onsubmit="createPreference(event)">
+    <label for="quantity">Quantidade: </label>
+    <input type="text" id="quantity" name="quantity">
+    <br>
+    <label for="price">Preço:     </label>
+    <input type="text" id="price" name="price">
+    <br>
+    <button type="submit">Enviar</button>
+  </form>
+  <br>
+  <div class="cho-container"></div>
+  <output id="statusOutput" hidden="true"></output>
+
+  <script>
+    let timer = null;
+    customerCardsGlobal = null;
+
+    async function createPreference(event) {
+      event.preventDefault()
+      var formQuantity = document.getElementById('quantity').value
+      var formPrice = document.getElementById('price').value
+
+      //let jsonBody = JSON.parse('{ "items": [ {"quantity": 1, "unit_price": 10 } ] }');
+      //let jsonBody = { "items": [ {"quantity": 1, "unit_price": 10 } ] }
+      var item = {quantity: formQuantity, unit_price: formPrice};
+
+      //console.log(JSON.stringify({items: [item]}));
+
+      const requestConfig = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({items: [item]})
+      };
+
+      fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/preferencia", requestConfig)
+        .then((response) => {
+          //console.log('Sucess!');
+          return response.text();
+        })
+        .then((body) => {
+          //console.log('BODY!!!!!!!!!!!!!!!!!!!!' + body);
+          const checkout = mp.checkout({
+              preference: {
+                  id: body // Indique o ID da preferência
+              },
+              render: {
+                  container: '.cho-container', // class do CSS para renderizar o botão de pagamento
+                  label: 'Pagar', // Muda o texto do botão de pagamento (opcional)
+              }
+          });
+        })
+        .catch((error) => {
+          console.error('There was an error!', error);
+        })
+        ;
+    }
+  </script>
+</body>
+</html>
