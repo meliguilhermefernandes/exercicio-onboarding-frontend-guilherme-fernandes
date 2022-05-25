@@ -7,14 +7,14 @@
     <input type="text" name="securityCode" id="form-checkout__securityCode" value="123" />
     <select name="issuer" id="form-checkout__issuer"></select>
     <select name="identificationType" id="form-checkout__identificationType"></select>
-    <input type="text" name="identificationNumber" id="form-checkout__identificationNumber" value="1231533"/>
+    <input type="text" name="identificationNumber" id="form-checkout__identificationNumber" value="26535272001"/>
     <select name="installments" id="form-checkout__installments"></select>
     <button type="submit" id="form-checkout__submit">Pagar</button>
     <progress value="0" class="progress-bar">Carregando...</progress>
  </form>
   <script src="https://sdk.mercadopago.com/js/v2"></script>
   <script>
-      const mp = new MercadoPago('TEST-f58f5ff6-d0bf-4971-b430-772b79a54278');
+      const mp = new MercadoPago('TEST-4a53e324-4ed4-40ed-9100-c29a1ab348b4');
       const cardForm = mp.cardForm({
         amount: "100.5",
         autoMount: true,
@@ -77,27 +77,27 @@
             } = cardForm.getCardFormData();
 
             //fetch("/process_payment", {
-              fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/cartao", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                token,
-                issuer_id,
-                payment_method_id,
-                transaction_amount: Number(amount),
-                installments: Number(installments),
-                description: "Descrição do produto",
-                payer: {
-                  email,
-                  identification: {
-                    type: identificationType,
-                    number: identificationNumber,
-                  },
+            fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/cartao", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token,
+              issuer_id,
+              payment_method_id,
+              transaction_amount: Number(amount),
+              installments: Number(installments),
+              description: "Descrição do produto",
+              payer: {
+                email,
+                identification: {
+                  type: identificationType,
+                  number: identificationNumber,
                 },
-              }),
-            });
+              },
+            }),
+          });
           },
           onFetching: (resource) => {
             console.log("Fetching resource: ", resource);
