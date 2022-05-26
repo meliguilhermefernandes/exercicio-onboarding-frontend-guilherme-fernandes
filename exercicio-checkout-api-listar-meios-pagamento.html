@@ -1,0 +1,30 @@
+<body>
+  <form onsubmit="listarMeiosPagamentos(event)">
+    <br>
+    <button type="submit">Listar meios pagamento</button>
+    <br>
+    <pre>
+      <code id="lista-meios-pagamento"></code>
+    </pre>
+  </form>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <script>
+    async function listarMeiosPagamentos(event) {
+      event.preventDefault();
+      const mp = new MercadoPago('TEST-4a53e324-4ed4-40ed-9100-c29a1ab348b4');
+
+      fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/meios-pagamento/listar", { method: 'GET' })
+        .then((response) => {
+          //console.log('Sucess!');
+          return response.json();
+        })
+        .then((jsonBody) => {
+          document.getElementById("lista-meios-pagamento").textContent = JSON.stringify(jsonBody);
+        })
+        .catch((error) => {
+          console.error('There was an error!', error);
+        });
+    }
+    
+  </script>
+</body>
