@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Pagamento Pix</title>
+</head>
+
+<body>
+  <form onsubmit="criarPagamentoPix(event)">
+    <label for="email">E-mail:     </label>
+    <input type="text" id="email" name="email" value="email_user@testuser.com">
+    <br>
+    <label for="cpf">CPF:     </label>
+    <input type="text" id="cpf" name="cpf" value="15635614680">
+    <br>
+    <label for="price">Preço:     </label>
+    <input type="text" id="price" name="price" value=2001>
+    <br>
+    <br>
+    <button type="submit">Enviar</button>
+    <br>
+    <br>
+    <label id="qrcode" name="qrcode"></label>
+    <br>
+    <label id="url" name="url"></label>
+    <a id="ticketurl" name="ticketurl"></a>
+    <br>
+    <br>
+    <img id="qrcodebase64" name="qrcodebase64"></img>
+  </form>
+  <br>
+  <div class="cho-container"></div>
+  <output id="statusOutput" hidden="true"></output>
+
+  <script>
+    async function criarPagamentoPix(event) {
+      event.preventDefault()
+      var formPrice = document.getElementById('price').value
+      var formEmail = document.getElementById('email').value
+      var formCpf = document.getElementById('cpf').value
+
+      var jsonBody = {transaction_amount: formPrice, payer: {email: formEmail, identification: {type: 'CPF', number: formCpf}}};
+
+      console.log(JSON.stringify(jsonBody));
+
+      const requestConfig = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(jsonBody)
+      };
+
+      fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/pix", requestConfig)
+        .then((response) => {
+          console.log('.then((response) => {');
+          return response.json();
+        })
+        .then((jsonBody) => {
+          //console.log('.then((body) => {' + JSON.stringify(jsonBody, undefined, 2));
+          document.getElementById("qrcode").textContent = 'QR Code: ' + jsonBody.qr_code;
+          document.getElementById("url").textContent = 'URL: ';
+          document.getElementById("ticketurl").textContent = jsonBody.ticket_url;
+          document.getElementById("ticketurl").setAttribute("href", jsonBody.ticket_url);
+          document.getElementById("qrcodebase64").src = 'data:image/png;base64,' + jsonBody.qr_code_base64;
+        })
+        .catch((error) => {
+          console.error('.catch((error) => {', error);
+        })
+        ;
+    }
+  </script>
+</body>
+</html>

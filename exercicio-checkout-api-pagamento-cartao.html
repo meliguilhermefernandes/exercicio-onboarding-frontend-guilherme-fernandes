@@ -78,26 +78,37 @@
 
             //fetch("/process_payment", {
             fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/cartao", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              token,
-              issuer_id,
-              payment_method_id,
-              transaction_amount: Number(amount),
-              installments: Number(installments),
-              description: "Descrição do produto",
-              payer: {
-                email,
-                identification: {
-                  type: identificationType,
-                  number: identificationNumber,
-                },
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            }),
-          });
+              body: JSON.stringify({
+                token,
+                issuer_id,
+                payment_method_id,
+                transaction_amount: Number(amount),
+                installments: Number(installments),
+                description: "Descrição do produto",
+                payer: {
+                  email,
+                  identification: {
+                    type: identificationType,
+                    number: identificationNumber,
+                  },
+                },
+              }),
+            })
+            .then((response) => {
+              console.log('.then((response) => {');
+              return response.json();
+            })
+            .then((jsonBody) => {
+              alert('Pagamento ' + jsonBody.id + ' ' + jsonBody.status)
+            })
+            .catch((error) => {
+              console.error('.catch((error) => {', error);
+            })
+            ;
           },
           onFetching: (resource) => {
             console.log("Fetching resource: ", resource);

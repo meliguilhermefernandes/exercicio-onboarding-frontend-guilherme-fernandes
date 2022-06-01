@@ -1,0 +1,27 @@
+<body>
+  <form onsubmit="listarMeiosPagamentos(event)">
+    <br>
+    <button type="submit">Listar meios pagamento</button>
+    <br>
+    <pre>
+      <code id="lista-meios-pagamento"></code>
+    </pre>
+  </form>
+  <script>
+    async function listarMeiosPagamentos(event) {
+      event.preventDefault();
+      
+      fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/meios-pagamento/listar", { method: 'GET' })
+        .then((response) => {
+          return response.json();
+        })
+        .then((jsonBody) => {
+          document.getElementById("lista-meios-pagamento").textContent = JSON.stringify(jsonBody, undefined, 2);
+        })
+        .catch((error) => {
+          console.error('There was an error!', error);
+        });
+    }
+    
+  </script>
+</body>
