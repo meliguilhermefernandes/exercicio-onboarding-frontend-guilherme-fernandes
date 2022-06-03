@@ -1,7 +1,7 @@
 <body>
   <form onsubmit="listarMeiosPagamentos(event)">
     <br>
-    <button type="submit">Listar meios pagamento</button>
+    <button type="button" onclick="listarMeiosPagamentos(event)">Listar meios pagamento</button>
     <br>
     <div id="listapagamentos"></div>
   </form>
@@ -22,9 +22,6 @@
           const table = document.createElement('table');
           
           jsonBody.forEach( option => {
-              const optValue = option.name;
-              const optLabel = option.thumbnail;
-
               const td = document.createElement('td');
               const img = document.createElement('img');
               img.src = option.thumbnail;
@@ -35,8 +32,8 @@
               td.appendChild(name);
               const tr = document.createElement('tr');
               tr.appendChild(td);
-              table.appendChild(tr);
               table.appendChild(br);
+              table.appendChild(tr);
           });
 
           listaMeiosPagamento.appendChild(table);

@@ -1,0 +1,85 @@
+<body>
+  <form onsubmit="(event) => event.preventDefault()">
+    <label for="price">Preço:     </label>
+    <input type="text" id="price" name="price" value=2001>
+    <br><br>
+    <label for="email">E-mail:     </label>
+    <input type="text" id="email" name="email" value="test_payer_1629812605@testuser.com">
+    <br><br>
+    <button type="button" onclick="listarCartoes(event)">Listar cartões</button>
+    <br><br>
+    <div id="listaCartoesSalvos"></div>
+  </form>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <script>
+    const mp = new MercadoPago('TEST-4a53e324-4ed4-40ed-9100-c29a1ab348b4');
+    let payerId;
+    function listarCartoes(event) {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
+      fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/cliente/listar-cartoes?email=" + email, { method: 'GET' })
+        .then((response) => {
+          return response.json();
+        })
+        .then((jsonBody) => {
+          const listaCartoesSalvos = document.getElementById('listaCartoesSalvos');
+          const tempOptions = document.createDocumentFragment();
+
+          jsonBody.forEach( option => {
+            payerId = option.customerId;
+            let radioButton = document.createElement("input");
+            radioButton.setAttribute("type", "radio");
+            radioButton.setAttribute("name", "radioCartoes");
+            radioButton.setAttribute("id", "radioCartoes");
+            radioButton.setAttribute("value", option.id);
+            let label = document.createElement('label');
+            label.textContent = 'Cartão final ' + option.lastFourDigits;
+            const p = document.createElement('p');
+            const img = document.createElement('img');
+            img.src = option.paymentMethod.thumbnail;
+            p.appendChild(radioButton);
+            p.appendChild(label);
+            p.appendChild(img);
+            const br = document.createElement('br');
+            listaCartoesSalvos.appendChild(br);
+            listaCartoesSalvos.appendChild(p);
+          });
+          let labelCvv = document.createElement('label');
+          labelCvv.textContent = "Cvv: ";
+          let inputCvv = document.createElement("input");
+          inputCvv.setAttribute("id", "inputCvv");
+          let pagarButton = document.createElement("button");
+          pagarButton.innerHTML = 'Pagar';
+          pagarButton.type = "button";
+          pagarButton.onclick = pagarComCartaoSalvo;
+          listaCartoesSalvos.appendChild(labelCvv);
+          listaCartoesSalvos.appendChild(inputCvv);
+          listaCartoesSalvos.appendChild(pagarButton);
+        })
+        .catch((error) => {
+          console.error('There was an error!', error);
+        });
+    }
+
+    async function pagarComCartaoSalvo() {
+      const token = await mp.createCardToken({ 
+        securityCode: document.getElementById('inputCvv').value,
+        cardId: document.getElementById('radioCartoes').value
+      });
+
+      const jsonBody = await fetch("http://localhost:9099/exercicio-onboarding-guilherme-fernandes/api/v1/cartao/pagar-cartao-salvo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: token.id,
+          payer: {
+            id: payerId
+          },
+        }),
+      });
+      alert('Pagamento ' + await jsonBody.json() + " criado com sucesso!!");
+    }
+  </script>
+</body>
